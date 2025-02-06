@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -20 }
+  exit: { opacity: 0, y: -20 },
 };
 
 function Dashboard() {
@@ -16,7 +16,18 @@ function Dashboard() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
-    setUser(storedUser);
+
+    // Generate a unique ID if it doesn't exist
+    if (storedUser) {
+      if (!storedUser.id) {
+        const uniqueId = crypto.randomUUID(); // Generate a unique ID
+        const updatedUser = { ...storedUser, id: uniqueId }; // Add the unique ID to the user object
+        localStorage.setItem("user", JSON.stringify(updatedUser)); // Update localStorage
+        setUser(updatedUser); // Update state
+      } else {
+        setUser(storedUser); // If ID already exists, set the user as is
+      }
+    }
   }, []);
 
   const handleLogout = () => {
@@ -33,14 +44,14 @@ function Dashboard() {
   };
 
   return (
-    <Box 
-      display="flex" 
-      justifyContent="center" 
-      alignItems="center" 
+    <Box
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
       height="100vh"
       sx={{
         background: "linear-gradient(135deg, #6a11cb 0%, #2575fc 100%)",
-        padding: "20px"
+        padding: "20px",
       }}
     >
       <AnimatePresence>
@@ -52,7 +63,7 @@ function Dashboard() {
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ type: "spring", stiffness: 100 }}
           >
-            <Card 
+            <Card
               sx={{
                 padding: 4,
                 borderRadius: 3,
@@ -61,7 +72,7 @@ function Dashboard() {
                 maxWidth: 400,
                 textAlign: "center",
                 bgcolor: "background.paper",
-                overflow: "hidden"
+                overflow: "hidden",
               }}
             >
               <motion.div
@@ -69,9 +80,9 @@ function Dashboard() {
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <Typography 
-                  variant="h5" 
-                  fontWeight="bold" 
+                <Typography
+                  variant="h5"
+                  fontWeight="bold"
                   gutterBottom
                   sx={{ color: "primary.main" }}
                 >
@@ -89,7 +100,8 @@ function Dashboard() {
                 {[
                   { label: "Email", value: user.email },
                   { label: "Phone", value: user.phone },
-                  { label: "Address", value: user.address }
+                  { label: "Address", value: user.address },
+                  { label: "User ID", value: user.id }, // Display the unique user ID
                 ].map((item, index) => (
                   <motion.div
                     key={index}
@@ -114,10 +126,10 @@ function Dashboard() {
                   variant="contained"
                   color="success"
                   fullWidth
-                  sx={{ 
+                  sx={{
                     fontWeight: "bold",
                     py: 1.5,
-                    borderRadius: 2
+                    borderRadius: 2,
                   }}
                   onClick={handleStartGame}
                   whileHover={{ scale: 1.05 }}
@@ -132,11 +144,11 @@ function Dashboard() {
                   variant="contained"
                   color="error"
                   fullWidth
-                  sx={{ 
+                  sx={{
                     mt: 2,
                     fontWeight: "bold",
                     py: 1.5,
-                    borderRadius: 2
+                    borderRadius: 2,
                   }}
                   onClick={handleLogout}
                   whileHover={{ scale: 1.05 }}
@@ -157,14 +169,14 @@ function Dashboard() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <Typography 
-              variant="h6" 
+            <Typography
+              variant="h6"
               color="error"
-              sx={{ 
+              sx={{
                 background: "white",
                 padding: 3,
                 borderRadius: 2,
-                boxShadow: 3
+                boxShadow: 3,
               }}
             >
               No user found. Please login.
